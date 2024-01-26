@@ -6,11 +6,12 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const moment = require('moment-timezone');;
 
+
 dotenv.config();
 
 const GoogleFinance = require('./models/GoogleFiance');
 const stockname = require('./models/stockname');
-
+const {isInTradingHours }=require("./Utills/checkMarketOpen")
 const app = express();
 const port = 4000;
 
@@ -25,8 +26,9 @@ async function fetchStockData(stock, market) {
     try {
         const response = await axios.get(url);
         const $ = cheerio.load(response.data);
-        const class1 = 'YMlKec.fxKbKc';
-        const price = $(`.${class1}`).text().trim().slice(1).replace(",", "");
+        const classPrice1 = 'YMlKec.fxKbKc';
+        const classTime1='ygUjEc';
+        const price = $(`.${classPrice1}`).text().trim().slice(1).replace(",", "");
 
         return {
             stock,
@@ -64,7 +66,12 @@ setInterval(async () => {
 
 //const resultdata=await stockname.insertMany(jsonData);
 //console.log("Number of stockEntries:1 " + resultdata.length);
-
+const isMarketOpen=isInTradingHours();
+console.log("isMarketOpen "+isMarketOpen)
+if(!isMarketOpen){
+console.log("Market is not open go home")
+return;
+}
 
         const stockEntries = await stockname.find({}).sort({ _id: -1 }).lean();
         console.log("Number of stockEntries: " + stockEntries.length);
@@ -94,8 +101,9 @@ setInterval(async () => {
         
 
         if (data.length > 0) {
-            const timestamp = moment().format('DD-MMM-YYYY HH:mm:ss');
-            const combinedData = {
+       //     const timestamp = moment().tz('Asia/Kolkata').format('DD-MMM-YYYY HH:mm:ss');
+       const timestamp=stockData  
+       const combinedData = {
                 timestamp,
                 data: [...data]
             };

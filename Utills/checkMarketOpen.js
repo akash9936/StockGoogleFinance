@@ -1,4 +1,4 @@
-export let isInTradingHours = () => {
+let isInTradingHours = () => {
     let now = new Date();
     const istOptions = { timeZone: 'Asia/Kolkata' }; // 'Asia/Kolkata' is the time zone for IST
 
@@ -15,3 +15,5 @@ export let isInTradingHours = () => {
     console.log("isAllowed is " + isAllowed);
     return isAllowed;
 };
+
+module.exports = { isInTradingHours };
