@@ -106,7 +106,7 @@ setInterval(async () => {
     } catch (error) {
         console.error('Error fetching or inserting data:', error.message);
     }
-}, 6000);
+}, 60000);
 
 // ...
 
