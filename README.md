@@ -1,1 +1,1 @@
-# StockGoogleFinance
+git rm -r --cached node_modules
