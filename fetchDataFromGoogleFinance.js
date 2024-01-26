@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const axios = require('axios');
 const cheerio = require('cheerio');
-const moment = require('moment');
+const moment = require('moment-timezone');;
 
 dotenv.config();
 
@@ -22,7 +22,6 @@ const mongooseOptions = {
 
 async function fetchStockData(stock, market) {
     const url = `https://www.google.com/finance/quote/${stock}:${market}`;
-
     try {
         const response = await axios.get(url);
         const $ = cheerio.load(response.data);
@@ -33,8 +32,9 @@ async function fetchStockData(stock, market) {
             stock,
             market,
             price: parseFloat(price),
-            timestamp: moment().format('DD-MMM-YYYY HH:mm:ss'),
+            timestamp: moment().tz('Asia/Kolkata').format('DD-MMM-YYYY HH:mm:ss'),
         };
+        
     } catch (error) {
         console.error('Error fetching data:', error.message);
         throw error;
@@ -68,10 +68,11 @@ setInterval(async () => {
 
         const stockEntries = await stockname.find({}).sort({ _id: -1 }).lean();
         console.log("Number of stockEntries: " + stockEntries.length);
-        console.log("Latest stockEntries: ", stockEntries);
+       // console.log("Latest stockEntries: ", stockEntries);
 
         const data = [];
-
+        const currentDate = moment().tz('Asia/Kolkata').format('DD-MMM-YYYY HH:mm:ss');
+        console.log("Current system date and time: " + currentDate.toLocaleString());
         if (stockEntries.length === 0) {
             console.error('Error: No data found in stockname collection.');
         }
@@ -80,7 +81,7 @@ setInterval(async () => {
            // console.log(`Processing entry: ${JSON.stringify(entry)}`);
             
             const stockData = await fetchStockData(entry.Symbol, entry.Market);
-
+           
             if (stockData) {
                 data.push({
                     symbol: stockData.stock,
@@ -90,6 +91,7 @@ setInterval(async () => {
                 console.error(`Error: Data for ${entry.Symbol}:${entry.Market} is not available.`);
             }
         }
+        
 
         if (data.length > 0) {
             const timestamp = moment().format('DD-MMM-YYYY HH:mm:ss');
@@ -106,7 +108,7 @@ setInterval(async () => {
     } catch (error) {
         console.error('Error fetching or inserting data:', error.message);
     }
-}, 60000);
+}, 30000);
 
 // ...
 
