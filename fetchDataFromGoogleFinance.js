@@ -19,10 +19,9 @@ const mongooseOptions = {
     useUnifiedTopology: true,
     bufferCommands: false
 };
-moment.tz.setDefault('Asia/Kolkata');
+
 async function fetchStockData(stock, market) {
     const url = `https://www.google.com/finance/quote/${stock}:${market}`;
-
     try {
         const response = await axios.get(url);
         const $ = cheerio.load(response.data);
@@ -33,7 +32,7 @@ async function fetchStockData(stock, market) {
             stock,
             market,
             price: parseFloat(price),
-            timestamp: moment().format('DD-MMM-YYYY HH:mm:ss'),
+            timestamp: moment().tz('Asia/Kolkata').format('DD-MMM-YYYY HH:mm:ss'),
         };
         
     } catch (error) {
@@ -72,7 +71,7 @@ setInterval(async () => {
        // console.log("Latest stockEntries: ", stockEntries);
 
         const data = [];
-        const currentDate = new Date();
+        const currentDate = moment().tz('Asia/Kolkata').format('DD-MMM-YYYY HH:mm:ss');
         console.log("Current system date and time: " + currentDate.toLocaleString());
         if (stockEntries.length === 0) {
             console.error('Error: No data found in stockname collection.');
